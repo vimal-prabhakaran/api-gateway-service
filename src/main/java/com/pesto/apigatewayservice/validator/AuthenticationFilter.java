@@ -27,6 +27,7 @@ public class AuthenticationFilter implements GatewayFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
+        String userName = "";
         if (validator.isSecured.test(request)) {
             if (authMissing(request)) {
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
@@ -37,8 +38,12 @@ public class AuthenticationFilter implements GatewayFilter {
             if (jwtUtil.isTokenExpired(token)) {
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
+            userName = jwtUtil.extractUsername(token);
+
         }
-        return chain.filter(exchange);
+        String finalUserName = userName;
+        return chain.filter(exchange.mutate().request(builder -> builder.header("X-UserId", finalUserName))
+                .build());
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) {

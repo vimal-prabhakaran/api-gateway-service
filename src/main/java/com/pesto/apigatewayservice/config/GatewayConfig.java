@@ -27,10 +27,12 @@ public class GatewayConfig {
                 .route("auth-manager", r -> r.path("/api/v1/auth/**")
                         .filters(f -> f.filter(authenticationFilter).requestRateLimiter(l -> l.setRateLimiter(redisRateLimiter())))
                         .uri("lb://auth-manager"))
-                .route("product-manager-service", r -> r.path("**/product", "**/catalog", "**/products/**")
+                .route("product-manager-service", r -> r.path("/api/v1/products/search", "/api/v1/seller/products",
+                                "/api/v1/seller/product")
                         .filters(f -> f.filter(authenticationFilter).requestRateLimiter(l -> l.setRateLimiter(redisRateLimiter())))
                         .uri("lb://product-manager-service"))
-                .route("order-manager-service", r -> r.path("**/catalog")
+                .route("order-manager-service", r -> r.path("/api/v1/order", "/api/v1/order/**","/api/v1/orders"
+                                ,"/api/v1/seller/orders","/api/v1/seller/order/**")
                         .filters(f -> f.filter(authenticationFilter).requestRateLimiter(l -> l.setRateLimiter(redisRateLimiter())))
                         .uri("lb://order-manager-service"))
 
